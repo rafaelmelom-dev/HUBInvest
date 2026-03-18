@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Fundo azul arredondado -->
+  <rect width="32" height="32" rx="8" fill="#2563eb"/>
+  <!-- Raio (ícone igual ao da sidebar) centralizado e em branco -->
+  <path
+    d="M18 4L9 17h6v7l9-11h-6z"
+    fill="white"
+    stroke="white"
+    stroke-width="0.5"
+    stroke-linejoin="round"
+  />
+</svg>

@@ -1,6 +1,6 @@
 // src/components/RegisterModal.jsx
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     const navigate = useNavigate();
@@ -8,28 +8,39 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     const [emailDigitado, setEmailDigitado] = useState("");
     const [senhaDigitada, setSenhaDigitada] = useState("");
 
-    if (!isOpen) return null;
+    const [visible, setVisible] = useState(false);
+    const [animating, setAnimating] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        let timer;
+        if (isOpen) {
+            setVisible(true);
+            timer = setTimeout(() => setAnimating(true), 10);
+        } else {
+            setAnimating(false);
+            timer = setTimeout(() => setVisible(false), 300);
+        }
+        return () => clearTimeout(timer);
+    }, [isOpen]);
+
+    if (!visible) return null;
 
     const handleRegister = async (e) => {
         e.preventDefault();
-
+        setIsLoading(true);
         try {
-            const response = await fetch(
-                "http://localhost:3000/api/registrar",
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        nome: nomeDigitado,
-                        email: emailDigitado,
-                        senha: senhaDigitada,
-                        tipo_perfil: "comum",
-                    }),
-                },
-            );
-
+            const response = await fetch("http://localhost:3000/api/registrar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    nome: nomeDigitado,
+                    email: emailDigitado,
+                    senha: senhaDigitada,
+                    tipo_perfil: "comum",
+                }),
+            });
             const data = await response.json();
-
             if (response.ok) {
                 alert("Conta criada com sucesso! Faça login.");
                 onClose();
@@ -39,33 +50,35 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
             }
         } catch (error) {
             console.error("Erro na requisição:", error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
-                onClick={onClose}
-            ></div>
 
-            <div className="relative w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-2xl transform transition-all scale-100 p-8">
+            {/* Backdrop — fade in/out */}
+            <div
+                onClick={onClose}
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+                style={{ opacity: animating ? 1 : 0 }}
+            />
+
+            {/* Card do modal — scale + fade + leve subida */}
+            <div
+                className="relative w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8 transition-all duration-300"
+                style={{
+                    opacity: animating ? 1 : 0,
+                    transform: animating ? "scale(1) translateY(0)" : "scale(0.95) translateY(12px)",
+                }}
+            >
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
                 >
-                    <svg
-                        className="w-6 h-6"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                        />
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
 
@@ -86,7 +99,8 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
                         <input
                             type="text"
                             required
-                            className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all text-gray-900 dark:text-white"
+                            disabled={isLoading}
+                            className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                             placeholder="Seu nome"
                             value={nomeDigitado}
                             onChange={(e) => setNomeDigitado(e.target.value)}
@@ -100,7 +114,8 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
                         <input
                             type="email"
                             required
-                            className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all text-gray-900 dark:text-white"
+                            disabled={isLoading}
+                            className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                             placeholder="exemplo@email.com"
                             value={emailDigitado}
                             onChange={(e) => setEmailDigitado(e.target.value)}
@@ -114,7 +129,8 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
                         <input
                             type="password"
                             required
-                            className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all text-gray-900 dark:text-white"
+                            disabled={isLoading}
+                            className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                             placeholder="••••••••"
                             value={senhaDigitada}
                             onChange={(e) => setSenhaDigitada(e.target.value)}
@@ -123,9 +139,20 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
 
                     <button
                         type="submit"
-                        className="w-full py-3.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
+                        disabled={isLoading}
+                        className="w-full py-3.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                        Criar Conta Grátis
+                        {isLoading ? (
+                            <>
+                                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                </svg>
+                                Criando conta...
+                            </>
+                        ) : (
+                            "Criar Conta Grátis"
+                        )}
                     </button>
                 </form>
 
