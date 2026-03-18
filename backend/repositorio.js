@@ -1,5 +1,7 @@
 import Database from "better-sqlite3";
 import bcrypt from "bcrypt";
+import dotenv from "dotenv";
+dotenv.config();
 
 export class DB {
     constructor() {
@@ -27,8 +29,8 @@ export class DB {
                 FOREIGN KEY(id_usuario) REFERENCES usuarios(id_usuario)
         );`);
 
-        const adminEmail = "admin@email.com";
-        const adminSenha = "admin";
+        const adminEmail = process.env.ADMIN_EMAIL;
+        const adminSenha = process.env.ADMIN_PASSWORD;
 
         const hash = bcrypt.hashSync(adminSenha, 10);
 
@@ -117,8 +119,6 @@ export class DB {
 
         try {
             const usuario = select.get(email);
-            console.log(usuario);
-            console.log(email);
 
             console.log("Objeto coletado do banco de dados");
 

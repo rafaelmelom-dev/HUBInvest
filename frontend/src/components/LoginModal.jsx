@@ -31,7 +31,6 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
 
                 onClose();
 
-                console.log(data.tipo_perfil);
                 if (data.tipo_perfil === "admin") {
                     navigate("/admin");
                 } else {

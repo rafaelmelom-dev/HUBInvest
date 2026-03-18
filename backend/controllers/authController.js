@@ -1,8 +1,10 @@
 import { DB } from "../repositorio.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 
-const SECRET = "SECRETISSIMA";
+const SECRET = process.env.JWT_KEY;
 
 const db = new DB();
 
@@ -11,7 +13,6 @@ const registrar = async (req, res) => {
     const hash = await bcrypt.hash(senha, 10);
 
     const usuario = db.criarUsuario({ nome, email, senha: hash });
-    console.log(usuario);
 
     res.status(201).json({
         mensagem: "Usuário criado!",

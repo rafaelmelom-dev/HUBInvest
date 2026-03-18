@@ -68,8 +68,6 @@ const atualizar = (req, res) => {
         data,
     });
 
-    console.log(transacaoAtualizada);
-
     if (!transacaoAtualizada) {
         return res
             .status(500)
@@ -165,7 +163,6 @@ const obterDashboard = async (req, res) => {
                 `https://api.coingecko.com/api/v3/simple/price?ids=${idsMoedas}&vs_currencies=brl`,
             );
             const precos = await response.json();
-            console.log(precos);
 
             for (const ticker of tickersParaBuscar) {
                 const idCoin = map[ticker] || ticker;
