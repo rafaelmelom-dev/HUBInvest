@@ -52,4 +52,6 @@ Em `frontend/`:
 npm run dev 
 ```
 
-Obs.: o comando acima inicia o servidor de desenvolvimento (mas pode ser feito o build também, utilizando `npm run build`, e assim iniciando um servidor no diretório `dist/`, como `npx http-server dist/`)
+Obs.: o comando acima inicia o servidor de desenvolvimento (mas pode ser feito o build também, utilizando `npm run build`, e assim iniciando um servidor no diretório `dist/`, como `npx serve -s dist`)
+
+> O pacote `serve` irá redirecionar as requisições de diversas rotas ao nosso arquivo principal `index.html`, já que se apenas servirmos com um servidor simples http, quando o React Router alterar a rota, o servidor http não conseguirá achar o html daquela rota, porque não existe, o react tem um ponto de entrada, em apenas um arquivo.
